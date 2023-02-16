@@ -46,9 +46,9 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 uint16_t adcRawData[20];
-uint16_t avgadcV = 0;
-uint16_t avgadcT = 0;
-uint16_t Vin25 = 0,Vin50 = 0,K = 0,C = 0;
+float avgadcV = 0;
+float avgadcT = 0;
+float Vin25 = 0,Vin50 = 0,K = 0,C = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -197,7 +197,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 2;
   hadc1.Init.DMAContinuousRequests = ENABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -307,17 +307,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-
 }
 
 /* USER CODE BEGIN 4 */
 
 
 void VoltageConverter() {
-	register int i, Vsum;
+	register int i = 0, Vsum = 0;
 	for (i = 0; i < 20; i += 2) {
 		Vsum += adcRawData[i];
 	}
@@ -327,7 +323,7 @@ void VoltageConverter() {
 }
 
 void TemperatureConverter() {
-	register int i, Tsum;
+	register int i = 0, Tsum = 0;
 	for (i = 1; i < 20; i += 2) {
 		Tsum += adcRawData[i];
 	}
